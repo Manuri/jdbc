@@ -22,10 +22,10 @@ import org.ballerinalang.bre.Context;
 import org.ballerinalang.bre.bvm.BlockingNativeCallableUnit;
 import org.ballerinalang.database.sql.Constants;
 import org.ballerinalang.database.sql.SQLDatasourceUtils;
+import org.ballerinalang.jvm.Strand;
+import org.ballerinalang.jvm.values.MapValue;
+import org.ballerinalang.jvm.values.ObjectValue;
 import org.ballerinalang.model.types.TypeKind;
-import org.ballerinalang.model.values.BMap;
-import org.ballerinalang.model.values.BRefType;
-import org.ballerinalang.model.values.BValue;
 import org.ballerinalang.natives.annotations.Argument;
 import org.ballerinalang.natives.annotations.BallerinaFunction;
 
@@ -48,11 +48,18 @@ public class CreateClient extends BlockingNativeCallableUnit {
 
     @Override
     public void execute(Context context) {
-        BMap<String, BValue> clientEndpointConfig = (BMap<String, BValue>) context.getRefArgument(0);
+       /* BMap<String, BValue> clientEndpointConfig = (BMap<String, BValue>) context.getRefArgument(0);
         BMap<String, BRefType> globalPoolOptions = (BMap<String, BRefType>) context.getRefArgument(1);
         BMap<String, BValue> sqlClient = SQLDatasourceUtils
                 .createSQLDBClient(context, clientEndpointConfig, globalPoolOptions);
         sqlClient.addNativeData(Constants.CONNECTOR_ID_KEY, UUID.randomUUID().toString());
-        context.setReturnValues(sqlClient);
+        context.setReturnValues(sqlClient);*/
+    }
+
+    public static ObjectValue createClient(Strand strand, MapValue<String, Object> config,
+            MapValue<String, Object> globalPoolOptions) {
+        ObjectValue sqlClient = SQLDatasourceUtils.createSQLDBClient(config, globalPoolOptions);
+        sqlClient.addNativeData(Constants.CONNECTOR_ID_KEY, UUID.randomUUID().toString());
+        return sqlClient;
     }
 }

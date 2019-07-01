@@ -16,9 +16,6 @@
  */
 package org.ballerinax.test.jdbc;
 
-import org.ballerinalang.launcher.util.BCompileUtil;
-import org.ballerinalang.launcher.util.BRunUtil;
-import org.ballerinalang.launcher.util.CompileResult;
 import org.ballerinalang.model.values.BBoolean;
 import org.ballerinalang.model.values.BDecimal;
 import org.ballerinalang.model.values.BFloat;
@@ -26,6 +23,9 @@ import org.ballerinalang.model.values.BInteger;
 import org.ballerinalang.model.values.BString;
 import org.ballerinalang.model.values.BValue;
 import org.ballerinalang.model.values.BValueArray;
+import org.ballerinalang.test.util.BCompileUtil;
+import org.ballerinalang.test.util.BRunUtil;
+import org.ballerinalang.test.util.CompileResult;
 import org.ballerinax.test.utils.SQLDBUtils;
 import org.ballerinax.test.utils.SQLDBUtils.ContainerizedTestDatabase;
 import org.ballerinax.test.utils.SQLDBUtils.DBType;
@@ -38,6 +38,7 @@ import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
+import java.io.PrintStream;
 import java.util.Calendar;
 
 import static org.ballerinax.test.utils.SQLDBUtils.DBType.H2;
@@ -74,6 +75,9 @@ public class SQLActionsTest {
 
     @BeforeClass
     public void setup() {
+        System.setProperty("enableJBallerinaTests", "true");
+        System.setProperty("BALLERINA_DEV_MODE_COMPILE", "true");
+        System.setProperty("BALLERINA_DEV_COMPILE_BALLERINA_ORG", "true");
         switch (dbType) {
         case MYSQL:
             testDatabase = new ContainerizedTestDatabase(dbType, "sqlfiles/SQLTest_Mysql_Data.sql");
@@ -97,8 +101,19 @@ public class SQLActionsTest {
         connectionArgs[1] = new BString(testDatabase.getUsername());
         connectionArgs[2] = new BString(testDatabase.getPassword());
 
-        result = BCompileUtil.compile("balfiles/sql_actions_test.bal");
-        resultNegative = BCompileUtil.compile("balfiles/sql_actions_negative_test.bal");
+        CompileResult x = BCompileUtil.compile("balfiles/temp.bal");
+        System.out.println(x.getErrorCount());
+        System.out.println(x.getDiagnostics()[0]);
+       // result = BCompileUtil.compile("balfiles/sql_actions_test.bal");
+
+        if (result.getErrorCount() != 0) {
+            for (int i = 0; i < result.getErrorCount(); i++) {
+                PrintStream p = System.out;
+                p.println(result.getDiagnostics()[i]);
+            }
+            Assert.fail();
+        }
+       // resultNegative = BCompileUtil.compile("balfiles/sql_actions_negative_test.bal");
     }
 
     @Test(groups = CONNECTOR_TEST)

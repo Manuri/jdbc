@@ -20,13 +20,18 @@
 
 <suite name="RedisConnector_IntegrationTest_Suite" verbose="1">
     <test name="JDBC Test Suite" preserve-order="true" parallel="false">
+        <parameter name="enableJBallerinaTests" value="true"/>
         <groups>
             <run>
                 <exclude name="HSQLDBNotSupported"/>
             </run>
         </groups>
-        <packages>
+        <!--<packages>
             <package name="org.ballerinax.test.jdbc.*"/>
-        </packages>
+        </packages>-->
+        <classes>
+            <class name="org.ballerinax.test.jdbc.SQLActionsTest"/>
+           <!-- <class name="org.ballerinax.test.jdbc.SQLConnectorInitTest"/>-->
+        </classes>
     </test>
 </suite>
